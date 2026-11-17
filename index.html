@@ -1,0 +1,1331 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>머니팜 🌱 나만의 저축 농장</title>
+<style>
+:root{
+  --green:#4caa70;--deep:#286b48;--mint:#e9f7e8;
+  --cream:#fffaf0;--peach:#ffbd9c;--text:#425849;
+  --muted:#829783;--line:#dfecd9;--red:#dc706c;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:#f6fbf3;color:var(--text);
+  font-family:"Malgun Gothic","Apple SD Gothic Neo",Arial,sans-serif;
+}
+button,input,select{font:inherit}
+button{cursor:pointer}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible,input:focus-visible,select:focus-visible{
+  outline:3px solid #8ccfa1;outline-offset:2px;
+}
+.hidden{display:none!important}
+.screen{display:none}
+.screen.active{display:block}
+.container{width:min(1080px,94%);margin:auto}
+.card{
+  background:white;border:1px solid var(--line);
+  border-radius:23px;padding:23px;margin-bottom:20px;
+  box-shadow:0 8px 24px #689e6610;
+}
+h1,h2,h3,p{overflow-wrap:anywhere}
+h2{font-size:21px;margin:0 0 16px}
+h3{font-size:16px}
+.muted{color:var(--muted);font-size:13px;line-height:1.75}
+.btn{
+  border:0;border-radius:13px;padding:13px 18px;
+  color:white;background:var(--green);font-weight:800;
+  transition:transform .15s,background .2s;
+}
+.btn:hover:not(:disabled){background:#39965d}
+.btn:active:not(:disabled){transform:scale(.96)}
+.btn-light{background:var(--mint);color:var(--deep)}
+.btn-light:hover:not(:disabled){background:#d9efd9}
+.btn-peach{background:var(--peach);color:#87472b}
+.btn-danger{background:#ffe9e6;color:#b34e4e}
+.btn-small{padding:9px 12px;font-size:12px}
+.full{width:100%}
+.row{display:flex;align-items:center;gap:10px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+label{display:block;font-size:13px;font-weight:800;margin:16px 0 8px}
+input,select{
+  width:100%;min-width:0;padding:13px;border:1px solid var(--line);
+  border-radius:12px;background:#fcfefb;color:var(--text);
+}
+input:focus,select:focus{outline:none;border-color:var(--green)}
+.green{color:var(--green)}
+.red{color:var(--red)}
+.pill{
+  display:inline-block;padding:7px 11px;border-radius:20px;
+  color:var(--deep);background:var(--mint);
+  font-size:12px;font-weight:800;
+}
+
+/* 홈 */
+#home{
+  min-height:100vh;
+  background:radial-gradient(circle at 50% 28%,#d7f0c8,#f8fcf3 72%);
+}
+.hero{
+  min-height:100vh;display:flex;flex-direction:column;
+  justify-content:center;align-items:center;
+  text-align:center;padding:25px;
+}
+.hero-icon{font-size:90px;line-height:1.5}
+.hero h1{
+  font-size:clamp(39px,7vw,56px);
+  color:var(--deep);margin:10px 0;
+}
+.hero p{color:#7e9c80;line-height:1.9}
+.hero .btn{font-size:17px;padding:17px 42px;margin-top:24px}
+.hero-tags{
+  display:flex;gap:9px;flex-wrap:wrap;
+  justify-content:center;margin-top:32px;
+}
+.hero-tags span{
+  background:white;border:1px solid var(--line);
+  padding:10px 13px;border-radius:22px;font-size:12px;
+}
+
+/* 헤더와 메뉴 */
+header{
+  background:#ffffffed;border-bottom:1px solid var(--line);
+  position:sticky;top:0;z-index:10;
+}
+.header-inner{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:10px;padding:14px 0;
+}
+.logo{font-weight:900;font-size:19px;color:var(--deep)}
+main{padding:23px 0 60px}
+.nav{
+  display:flex;flex-wrap:wrap;gap:8px;margin-bottom:21px;
+}
+.nav button{flex:1;min-width:90px}
+.nav .selected{background:var(--green);color:white}
+.page{display:none}
+.page.active{display:block;animation:fade .25s ease}
+@keyframes fade{
+  from{opacity:0;transform:translateY(9px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+/* 요약 */
+.total-card{
+  background:linear-gradient(130deg,#5db781,#a2d896);
+  color:white;border:0;position:relative;overflow:hidden;
+}
+.total-card:after{
+  content:"🌱";font-size:120px;position:absolute;
+  top:-40px;right:-10px;opacity:.16;pointer-events:none;
+}
+.big-money{
+  font-size:clamp(35px,6vw,53px);
+  font-weight:900;margin:12px 0;overflow-wrap:anywhere;
+}
+.summary-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
+}
+.summary{
+  padding:13px;background:#ffffff34;border-radius:13px;
+}
+.summary span{font-size:12px;display:block}
+.summary strong{
+  display:block;margin-top:7px;font-size:clamp(14px,3vw,20px);
+  overflow-wrap:anywhere;
+}
+.progress{
+  height:15px;background:#e3f1dc;
+  border-radius:30px;overflow:hidden;margin:14px 0 8px;
+}
+.progress-fill{
+  height:100%;width:0;border-radius:30px;
+  background:linear-gradient(90deg,#8ccc87,#3faa70);
+  transition:width .55s;
+}
+.between{display:flex;justify-content:space-between;gap:10px}
+
+/* 농장 배경 */
+.farm{
+  position:relative;overflow:hidden;min-height:340px;
+  background:linear-gradient(
+    #c8eeff 0%,#e6f7df 53%,#9ada8c 54%,#74c46f 100%
+  );
+  border:5px solid #e2f4d8;border-radius:23px;
+  padding:20px 14px;text-align:center;
+}
+.farm.sky-night{
+  background:linear-gradient(#455e88 0%,#7594b0 53%,#70ad79 54%,#578e5b 100%);
+}
+.farm-sky{
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:28px;position:relative;z-index:1;
+}
+.character{
+  font-size:78px;line-height:1.3;
+  display:inline-block;position:relative;z-index:2;
+}
+.character.happy{animation:jump .65s ease}
+@keyframes jump{
+  0%,100%{transform:translateY(0) rotate(0)}
+  40%{transform:translateY(-23px) rotate(-8deg)}
+  70%{transform:translateY(-7px) rotate(8deg)}
+}
+.farm-message{
+  display:table;margin:8px auto 12px;padding:8px 14px;
+  border-radius:22px;background:#ffffffe8;
+  color:#47784b;font-weight:800;font-size:13px;
+  position:relative;z-index:2;
+}
+.plots{
+  display:grid;grid-template-columns:repeat(6,minmax(0,1fr));
+  gap:7px;position:relative;z-index:1;margin-top:15px;
+}
+.plot{
+  min-height:63px;background:#9c6e48bb;border:2px solid #c39165;
+  border-radius:16px 16px 10px 10px;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  color:#fff5df;gap:3px;
+}
+.plot span{font-size:26px}
+.plot small{font-size:9px}
+.decor-row{
+  position:relative;z-index:1;
+  min-height:40px;font-size:29px;
+  display:flex;gap:10px;justify-content:center;flex-wrap:wrap;
+}
+.farm-note{text-align:center;color:#7b9c7c;font-size:12px;margin-top:10px}
+
+/* 보상과 기록 */
+.reward-grid{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;
+}
+.reward-item{
+  background:#f9fcf6;border:1px solid var(--line);
+  border-radius:16px;padding:16px 8px;text-align:center;
+}
+.reward-icon{font-size:37px}
+.reward-item strong{display:block;margin:9px 0 5px;font-size:13px}
+.reward-item small{display:block;color:var(--muted);font-size:11px}
+.reward-item button{width:100%;margin-top:10px}
+.record{
+  padding:14px 0;border-bottom:1px solid var(--line);
+  display:flex;justify-content:space-between;align-items:center;gap:12px;
+}
+.record strong{font-size:14px}
+.record small{display:block;color:var(--muted);margin-top:5px;font-size:12px}
+.record-amount{font-weight:900;white-space:nowrap}
+.empty{
+  padding:25px;background:#f5faf1;border-radius:14px;
+  text-align:center;color:var(--muted);font-size:13px;line-height:1.7;
+}
+.info{
+  padding:14px;background:#edf8e9;border-radius:13px;
+  color:#52835b;line-height:1.8;font-size:13px;margin-top:15px;
+}
+.mini-grid{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:10px;
+}
+.mini-stat{background:#f0f8ec;padding:16px;border-radius:14px}
+.mini-stat strong{display:block;margin-top:7px}
+.category-line{
+  display:flex;justify-content:space-between;gap:10px;font-size:13px;
+}
+.category-bar{
+  height:10px;background:#e6f2e0;border-radius:20px;
+  overflow:hidden;margin:7px 0 15px;
+}
+.category-bar div{height:100%;background:#65b882;border-radius:20px}
+
+/* 팝업 */
+.overlay{
+  position:fixed;inset:0;background:#294c359e;
+  z-index:50;display:flex;align-items:center;justify-content:center;
+  padding:18px;backdrop-filter:blur(4px);
+}
+.modal{
+  width:min(430px,100%);background:white;border-radius:24px;
+  padding:26px;text-align:center;border:3px solid #b7dfb1;
+  animation:pop .32s ease;
+}
+@keyframes pop{
+  from{opacity:0;transform:scale(.85)}
+  to{opacity:1;transform:scale(1)}
+}
+.modal-icon{font-size:83px}
+.modal p{line-height:1.8;color:var(--muted)}
+.toast{
+  position:fixed;z-index:100;bottom:23px;left:50%;
+  transform:translateX(-50%);background:#307e50;color:white;
+  border-radius:27px;padding:13px 20px;
+  max-width:90%;text-align:center;font-size:13px;
+}
+.particle{
+  position:fixed;z-index:90;pointer-events:none;font-size:29px;
+  animation:floatUp 1.1s ease-out forwards;
+}
+@keyframes floatUp{
+  from{opacity:1;transform:translateY(0) scale(.7)}
+  to{opacity:0;transform:translateY(-110px) scale(1.6)}
+}
+footer{
+  text-align:center;color:#99b49b;font-size:12px;
+  line-height:1.8;padding:24px;
+}
+@media(max-width:750px){
+  .grid{grid-template-columns:1fr;gap:0}
+  .card{padding:17px}
+  .reward-grid{grid-template-columns:repeat(2,1fr)}
+  .plots{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .summary-grid{gap:5px}
+  .summary{padding:10px 6px}
+  .summary span{font-size:10px}
+  .summary strong{font-size:13px}
+  .nav button{padding:11px 7px;font-size:12px;min-width:75px}
+  .character{font-size:65px}
+}
+@media(max-width:420px){
+  .plots{gap:4px}
+  .plot{min-height:57px}
+  .plot span{font-size:23px}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.01ms!important;
+    transition-duration:.01ms!important;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- 홈 -->
+<section class="screen active" id="home">
+  <div class="hero">
+    <div class="hero-icon">🌱🐰</div>
+    <h1>머니팜</h1>
+    <p>
+      오늘 저축한 돈이 내일의 농장을 키워요!<br>
+      작은 저축으로 씨앗을 심고,<br>
+      작물과 선물로 나만의 농장을 꾸며 보세요.
+    </p>
+    <button class="btn" id="startBtn">
+      🌾 나의 농장 시작하기
+    </button>
+    <div class="hero-tags">
+      <span>💰 목표 저축</span>
+      <span>🌱 작물 성장</span>
+      <span>🎁 랜덤 보상</span>
+      <span>📒 용돈 가계부</span>
+    </div>
+    <p class="muted">실제 은행 계좌와 연결되지 않는 저축 기록 게임이에요.</p>
+  </div>
+</section>
+
+<!-- 앱 -->
+<section class="screen" id="app">
+  <header>
+    <div class="container header-inner">
+      <div class="logo">🌱 MONEY FARM</div>
+      <div class="row">
+        <span class="pill" id="levelBadge">Lv.1</span>
+        <button class="btn btn-light btn-small" id="homeBtn">홈</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="nav">
+      <button class="btn btn-light selected" data-page="farmPage">
+        🏡 나의 농장
+      </button>
+      <button class="btn btn-light" data-page="savingPage">
+        💰 저축하기
+      </button>
+      <button class="btn btn-light" data-page="walletPage">
+        📒 용돈 관리
+      </button>
+      <button class="btn btn-light" data-page="itemsPage">
+        🎁 보상 창고
+      </button>
+    </div>
+
+    <!-- 농장 -->
+    <div class="page active" id="farmPage">
+      <section class="card total-card">
+        <p>💚 나의 누적 저축액</p>
+        <div class="big-money" id="totalSaved">0원</div>
+        <div class="summary-grid">
+          <div class="summary">
+            <span>목표 금액</span>
+            <strong id="goalSummary">미설정</strong>
+          </div>
+          <div class="summary">
+            <span>달성률</span>
+            <strong id="rateSummary">0%</strong>
+          </div>
+          <div class="summary">
+            <span>저축 횟수</span>
+            <strong id="timesSummary">0회</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="between">
+          <h2>🌾 나의 머니팜</h2>
+          <span class="pill" id="farmLevel">농장 Lv.1</span>
+        </div>
+        <div class="farm" id="farmScene">
+          <div class="farm-sky">
+            <span>☁️</span>
+            <span id="skySun">☀️</span>
+            <span>☁️</span>
+          </div>
+          <div class="decor-row" id="farmDecorations"></div>
+          <div class="character" id="character">🐰</div>
+          <div class="farm-message" id="characterMessage">
+            첫 저축을 기다리고 있어요!
+          </div>
+          <div class="plots" id="farmPlots"></div>
+        </div>
+        <p class="farm-note" id="cropCount">
+          저축할 때마다 작물이 추가돼요.
+        </p>
+        <button class="btn full" data-goto="savingPage"
+                style="margin-top:15px">
+          🌱 저축하고 작물 심기 →
+        </button>
+      </section>
+
+      <section class="card">
+        <h2>🎯 저축 목표 달성도</h2>
+        <div class="between">
+          <strong id="farmProgressText">목표를 설정해 주세요.</strong>
+          <strong id="farmProgressRate">0%</strong>
+        </div>
+        <div class="progress">
+          <div class="progress-fill" id="farmProgressFill"></div>
+        </div>
+        <div class="info" id="growthHint">
+          저축 목표를 설정하면 성장 게이지가 표시돼요.
+        </div>
+      </section>
+    </div>
+
+    <!-- 저축 -->
+    <div class="page" id="savingPage">
+      <div class="grid">
+        <section class="card">
+          <h2>🎯 나의 저축 목표</h2>
+          <p class="muted">
+            모으고 싶은 금액을 설정해 보세요.
+            목표는 나중에 변경할 수 있어요.
+          </p>
+          <label for="goalInput">목표 금액 (원)</label>
+          <input id="goalInput" type="number" min="1" step="1"
+                 placeholder="예: 100000">
+          <button class="btn full" id="setGoalBtn"
+                  style="margin-top:15px">목표 설정하기</button>
+          <div class="info" id="goalStatus">
+            아직 목표가 설정되지 않았어요.
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>💰 오늘의 저축하기</h2>
+          <p class="muted">
+            저축한 금액을 기록하면 작물이 생기고
+            랜덤 보상이 지급돼요.
+          </p>
+
+          <label for="savingInput">저축 금액 (원)</label>
+          <input id="savingInput" type="number"
+                 min="1" step="1" placeholder="예: 10000">
+
+          <label for="savingSource">저축한 돈의 출처</label>
+          <select id="savingSource">
+            <option value="external">별도로 저축한 돈</option>
+            <option value="wallet">등록한 용돈에서 저축</option>
+          </select>
+
+          <p class="muted" id="sourceHint">
+            별도로 저축한 돈은 용돈 잔액에서 차감되지 않아요.
+          </p>
+
+          <button class="btn full" id="saveMoneyBtn"
+                  style="margin-top:18px">
+            🌱 저축 완료! 작물 키우기
+          </button>
+
+          <div class="info">
+            🌷 저축 성공 시 작물 1개와 랜덤 아이템 1개를 받아요.
+            한 번에 많이 저축하면 더 성장한 작물이 등장해요.
+          </div>
+        </section>
+      </div>
+
+      <section class="card">
+        <h2>📈 내 저축 현황</h2>
+        <div class="mini-grid">
+          <div class="mini-stat">
+            <span class="muted">누적 저축액</span>
+            <strong id="savingTotal">0원</strong>
+          </div>
+          <div class="mini-stat">
+            <span class="muted">목표까지 남은 금액</span>
+            <strong id="savingRemaining">-</strong>
+          </div>
+        </div>
+        <div class="progress">
+          <div class="progress-fill" id="savingProgressFill"></div>
+        </div>
+        <p class="muted" id="savingProgressLabel"></p>
+      </section>
+    </div>
+
+    <!-- 용돈 -->
+    <div class="page" id="walletPage">
+      <div class="grid">
+        <section class="card">
+          <h2>👛 나의 용돈통장</h2>
+          <div class="big-money" id="walletBalance"
+               style="color:var(--deep)">0원</div>
+          <div class="mini-grid">
+            <div class="mini-stat">
+              <span class="muted">받은 용돈</span>
+              <strong id="incomeTotal">0원</strong>
+            </div>
+            <div class="mini-stat">
+              <span class="muted">지출 합계</span>
+              <strong id="expenseTotal">0원</strong>
+            </div>
+          </div>
+          <p class="muted">
+            용돈 잔액 = 받은 용돈 − 지출 − 용돈에서 저축한 금액
+          </p>
+        </section>
+
+        <section class="card">
+          <h2>💵 용돈 등록하기</h2>
+          <label for="incomeAmount">받은 용돈 (원)</label>
+          <input id="incomeAmount" type="number" min="1"
+                 step="1" placeholder="예: 50000">
+          <button class="btn full" id="addIncomeBtn"
+                  style="margin-top:15px">
+            + 용돈 추가
+          </button>
+        </section>
+      </div>
+
+      <section class="card">
+        <h2>🧾 지출 기록하기</h2>
+        <div class="grid">
+          <div>
+            <label for="expenseName">사용처</label>
+            <input id="expenseName" maxlength="50"
+                   placeholder="예: 학교 매점">
+          </div>
+          <div>
+            <label for="expenseAmount">지출 금액 (원)</label>
+            <input id="expenseAmount" type="number"
+                   min="1" step="1" placeholder="예: 3500">
+          </div>
+        </div>
+        <label for="expenseCategory">지출 카테고리</label>
+        <select id="expenseCategory">
+          <option value="음식">🍔 음식</option>
+          <option value="교통">🚌 교통</option>
+          <option value="쇼핑">🛍️ 쇼핑</option>
+          <option value="취미">🎮 취미</option>
+          <option value="공부">📚 공부</option>
+          <option value="기타">💸 기타</option>
+        </select>
+        <button class="btn full" id="addExpenseBtn"
+                style="margin-top:15px">
+          지출 기록하기
+        </button>
+      </section>
+
+      <section class="card">
+        <h2>📊 카테고리별 지출</h2>
+        <div id="categoryStats"></div>
+      </section>
+
+      <section class="card">
+        <h2>📜 용돈·저축 내역</h2>
+        <div id="recordsList"></div>
+      </section>
+    </div>
+
+    <!-- 보상 창고 -->
+    <div class="page" id="itemsPage">
+      <section class="card">
+        <h2>🎁 나의 랜덤 보상 창고</h2>
+        <p class="muted">
+          저축할 때마다 씨앗, 장식, 의상 중 하나를 받아요.
+          장식과 의상은 농장에 적용할 수 있어요.
+        </p>
+        <div class="mini-grid">
+          <div class="mini-stat">
+            <span class="muted">총 보상 획득</span>
+            <strong id="rewardCount">0개</strong>
+          </div>
+          <div class="mini-stat">
+            <span class="muted">보유 아이템 종류</span>
+            <strong id="uniqueCount">0종</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>🎨 아이템 보관함</h2>
+        <div class="reward-grid" id="inventoryGrid"></div>
+      </section>
+
+      <section class="card">
+        <h2>🌼 꾸민 농장 미리보기</h2>
+        <div class="farm">
+          <div class="farm-sky">
+            <span>☁️</span><span>🌞</span><span>☁️</span>
+          </div>
+          <div class="decor-row" id="previewDecorations"></div>
+          <div class="character" id="previewCharacter">🐰</div>
+          <div class="farm-message">내가 꾸민 머니팜 💚</div>
+          <div class="plots" id="previewPlots"></div>
+        </div>
+      </section>
+    </div>
+  </main>
+  <footer>
+    🌱 머니팜 · 작은 저축이 만드는 큰 변화<br>
+    실제 송금 없이 저축·용돈을 직접 기록하는 교육용 서비스입니다.
+  </footer>
+</section>
+
+<!-- 보상 팝업 -->
+<div class="overlay hidden" id="rewardModal"
+     role="dialog" aria-modal="true" aria-label="저축 보상">
+  <div class="modal">
+    <div class="modal-icon" id="rewardEmoji">🎁</div>
+    <h2 id="rewardTitle">저축 성공!</h2>
+    <p id="rewardText"></p>
+    <button class="btn full" id="closeRewardBtn">
+      🎉 농장으로 돌아가기
+    </button>
+  </div>
+</div>
+
+<div class="toast hidden" id="toast"
+     role="status" aria-live="polite"></div>
+
+<script>
+"use strict";
+
+/* 1. 아이템과 기본 상태 */
+
+const $ = id => document.getElementById(id);
+const KEY = "money-farm-v1";
+
+const ITEMS = [
+  {id:"seedCarrot",type:"seed",name:"당근 씨앗",emoji:"🥕"},
+  {id:"seedFlower",type:"seed",name:"꽃 씨앗",emoji:"🌻"},
+  {id:"seedTree",type:"seed",name:"나무 씨앗",emoji:"🌳"},
+  {id:"flower",type:"decor",name:"꽃밭",emoji:"🌷"},
+  {id:"fence",type:"decor",name:"울타리",emoji:"🪵"},
+  {id:"house",type:"decor",name:"작은 농장집",emoji:"🏡"},
+  {id:"rainbow",type:"decor",name:"무지개",emoji:"🌈"},
+  {id:"hat",type:"outfit",name:"농부 모자",emoji:"👒"},
+  {id:"crown",type:"outfit",name:"황금 왕관",emoji:"👑"},
+  {id:"ribbon",type:"outfit",name:"분홍 리본",emoji:"🎀"}
+];
+
+function defaultState(){
+  return {
+    goal:0,
+    records:[],
+    crops:[],
+    inventory:[],
+    placed:[],
+    outfit:null,
+    lastMessage:"첫 저축을 기다리고 있어요!",
+    goalCelebrated:false
+  };
+}
+
+function validRecord(r){
+  return r && typeof r.id==="string" &&
+    ["income","saving","expense"].includes(r.type) &&
+    Number.isSafeInteger(r.amount) && r.amount>0 &&
+    typeof r.date==="string";
+}
+
+function load(){
+  try{
+    const raw=localStorage.getItem(KEY);
+    if(!raw)return defaultState();
+    const d=JSON.parse(raw);
+    if(!d || !Array.isArray(d.records) ||
+       !d.records.every(validRecord) ||
+       !Array.isArray(d.crops) ||
+       !Array.isArray(d.inventory) ||
+       !Array.isArray(d.placed) ||
+       !Number.isSafeInteger(d.goal) || d.goal<0){
+      return defaultState();
+    }
+    return {...defaultState(),...d};
+  }catch{
+    return defaultState();
+  }
+}
+
+let state=load();
+let toastTimer;
+
+function persist(){
+  try{
+    localStorage.setItem(KEY,JSON.stringify(state));
+    return true;
+  }catch{
+    toast("기록 저장에 실패했어요. 저장 공간을 확인해 주세요.");
+    return false;
+  }
+}
+
+function commit(change){
+  const backup=JSON.stringify(state);
+  change();
+
+  if(!persist()){
+    state=JSON.parse(backup);
+    return false;
+  }
+  return true;
+}
+
+function money(n){
+  return Math.round(n).toLocaleString("ko-KR")+"원";
+}
+
+function validAmount(value){
+  if(String(value).trim()==="")return null;
+  const n=Number(value);
+  return Number.isSafeInteger(n)&&n>0?n:null;
+}
+
+function uid(){
+  return window.crypto?.randomUUID?.() ||
+    Date.now()+"-"+Math.random().toString(36).slice(2);
+}
+
+function toast(text){
+  $("toast").textContent=text;
+  $("toast").classList.remove("hidden");
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(
+    ()=>$("toast").classList.add("hidden"),2700
+  );
+}
+
+function showScreen(id){
+  document.querySelectorAll(".screen").forEach(s=>
+    s.classList.toggle("active",s.id===id));
+  window.scrollTo(0,0);
+}
+
+function showPage(id){
+  document.querySelectorAll(".page").forEach(p=>
+    p.classList.toggle("active",p.id===id));
+  document.querySelectorAll("[data-page]").forEach(b=>
+    b.classList.toggle("selected",b.dataset.page===id));
+  renderAll();
+  window.scrollTo(0,0);
+}
+
+$("startBtn").onclick=()=>{
+  showScreen("app");
+  showPage("farmPage");
+};
+$("homeBtn").onclick=()=>showScreen("home");
+
+document.querySelectorAll("[data-page]").forEach(b=>
+  b.onclick=()=>showPage(b.dataset.page));
+
+document.querySelectorAll("[data-goto]").forEach(b=>
+  b.onclick=()=>showPage(b.dataset.goto));
+
+/* 2. 금액 계산 */
+
+function sumRecords(type){
+  return state.records
+    .filter(r=>r.type===type)
+    .reduce((sum,r)=>sum+r.amount,0);
+}
+
+function totalSaved(){return sumRecords("saving")}
+function totalIncome(){return sumRecords("income")}
+function totalExpense(){return sumRecords("expense")}
+
+function walletSaved(){
+  return state.records
+    .filter(r=>r.type==="saving" && r.source==="wallet")
+    .reduce((sum,r)=>sum+r.amount,0);
+}
+
+function walletBalance(){
+  return totalIncome()-totalExpense()-walletSaved();
+}
+
+function progressRate(){
+  return state.goal>0?totalSaved()/state.goal*100:0;
+}
+
+function level(){
+  const saved=totalSaved();
+  if(saved>=300000)return 5;
+  if(saved>=150000)return 4;
+  if(saved>=70000)return 3;
+  if(saved>=30000)return 2;
+  return 1;
+}
+
+function record(type,amount,extra={}){
+  return {
+    id:uid(),
+    type,amount,
+    date:new Date().toLocaleString("ko-KR"),
+    time:Date.now(),
+    ...extra
+  };
+}
+
+/* 3. 목표 설정 */
+
+$("setGoalBtn").onclick=()=>{
+  const goal=validAmount($("goalInput").value);
+
+  if(goal===null){
+    toast("저축 목표는 1원 이상의 정수로 입력해 주세요.");
+    return;
+  }
+
+  if(!commit(()=>{
+    state.goal=goal;
+    state.goalCelebrated=false;
+  }))return;
+
+  $("goalInput").value="";
+  renderAll();
+  toast("🎯 새로운 저축 목표를 설정했어요!");
+
+  checkGoal();
+};
+
+/* 4. 저축 완료와 랜덤 보상 */
+
+function cropFromAmount(amount){
+  if(amount>=50000)return "🌳";
+  if(amount>=20000)return "🌻";
+  if(amount>=10000)return "🌱";
+  return "🌰";
+}
+
+function randomItem(){
+  return ITEMS[Math.floor(Math.random()*ITEMS.length)];
+}
+
+$("savingSource").onchange=renderSourceHint;
+
+function renderSourceHint(){
+  $("sourceHint").textContent=
+    $("savingSource").value==="wallet"
+      ?"용돈통장에서 금액이 차감됩니다. 현재 잔액: "+
+        money(walletBalance())
+      :"별도로 저축한 돈으로 기록하며 용돈 잔액은 차감하지 않아요.";
+}
+
+$("saveMoneyBtn").onclick=()=>{
+  const amount=validAmount($("savingInput").value);
+  const source=$("savingSource").value;
+
+  if(state.goal<=0){
+    toast("먼저 저축 목표를 설정해 주세요.");
+    return;
+  }
+
+  if(amount===null){
+    toast("저축 금액은 1원 이상의 정수로 입력해 주세요.");
+    return;
+  }
+
+  if(!["wallet","external"].includes(source)){
+    toast("올바른 저축 출처를 선택해 주세요.");
+    return;
+  }
+
+  if(source==="wallet" && amount>walletBalance()){
+    toast("용돈통장 잔액보다 많이 저축할 수 없어요.");
+    return;
+  }
+
+  if(!Number.isSafeInteger(totalSaved()+amount)){
+    toast("누적 저축 금액이 너무 커요.");
+    return;
+  }
+
+  const item=randomItem();
+  const crop=cropFromAmount(amount);
+
+  if(!commit(()=>{
+    state.records.push(record("saving",amount,{source}));
+
+    state.crops.push({
+      id:uid(),emoji:crop,amount
+    });
+
+    state.inventory.push(item.id);
+    state.lastMessage=
+      `야호! ${money(amount)} 저축 성공! 🌱`;
+  }))return;
+
+  $("savingInput").value="";
+  animateFarm();
+  renderAll();
+
+  $("rewardEmoji").textContent=item.emoji;
+  $("rewardTitle").textContent="🎉 저축 성공!";
+  $("rewardText").textContent=
+    `${money(amount)}을 저축했어요!\n`+
+    `농장에 ${crop} 작물이 자랐어요.\n`+
+    `랜덤 보상: ${item.name} 획득!`;
+  $("rewardText").style.whiteSpace="pre-line";
+  $("rewardModal").classList.remove("hidden");
+
+  checkGoal();
+};
+
+$("closeRewardBtn").onclick=()=>{
+  $("rewardModal").classList.add("hidden");
+  showPage("farmPage");
+};
+
+function checkGoal(){
+  if(state.goal<=0 ||
+     totalSaved()<state.goal ||
+     state.goalCelebrated)return;
+
+  if(!commit(()=>{state.goalCelebrated=true}))return;
+
+  toast("🏆 목표 저축 달성! 축하해요!");
+}
+
+function animateFarm(){
+  for(let i=0;i<9;i++){
+    const el=document.createElement("div");
+    el.className="particle";
+    el.textContent=i%3===0?"✨":i%2===0?"🌱":"💚";
+    el.style.left=(20+Math.random()*60)+"%";
+    el.style.top=(35+Math.random()*30)+"%";
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(),1150);
+  }
+
+  const c=$("character");
+  c.classList.remove("happy");
+  void c.offsetWidth;
+  c.classList.add("happy");
+}
+
+/* 5. 용돈 입력 */
+
+$("addIncomeBtn").onclick=()=>{
+  const amount=validAmount($("incomeAmount").value);
+
+  if(amount===null){
+    toast("받은 용돈을 1원 이상의 정수로 입력해 주세요.");
+    return;
+  }
+
+  if(!Number.isSafeInteger(totalIncome()+amount)){
+    toast("금액이 너무 커요.");
+    return;
+  }
+
+  if(!commit(()=>{
+    state.records.push(record("income",amount));
+  }))return;
+
+  $("incomeAmount").value="";
+  renderAll();
+  toast("💵 용돈 "+money(amount)+"을 등록했어요!");
+};
+
+/* 6. 지출 기록 */
+
+$("addExpenseBtn").onclick=()=>{
+  const name=$("expenseName").value.trim();
+  const amount=validAmount($("expenseAmount").value);
+  const category=$("expenseCategory").value;
+
+  if(!name){
+    toast("사용처를 입력해 주세요.");
+    return;
+  }
+
+  if(amount===null){
+    toast("지출 금액은 1원 이상의 정수로 입력해 주세요.");
+    return;
+  }
+
+  if(amount>walletBalance()){
+    toast("남은 용돈보다 지출 금액이 커요.");
+    return;
+  }
+
+  if(!["음식","교통","쇼핑","취미","공부","기타"]
+      .includes(category)){
+    toast("지출 카테고리를 선택해 주세요.");
+    return;
+  }
+
+  if(!commit(()=>{
+    state.records.push(
+      record("expense",amount,{name,category})
+    );
+  }))return;
+
+  $("expenseName").value="";
+  $("expenseAmount").value="";
+  renderAll();
+  toast("🧾 지출 기록을 저장했어요.");
+};
+
+/* 7. 농장 작물과 꾸미기 */
+
+function characterEmoji(){
+  const outfit=state.outfit;
+  if(outfit==="crown")return "🐰👑";
+  if(outfit==="hat")return "🐰👒";
+  if(outfit==="ribbon")return "🐰🎀";
+  if(level()>=4)return "🐰✨";
+  return "🐰";
+}
+
+function renderPlots(id){
+  const box=$(id);
+  box.replaceChildren();
+
+  const visible=state.crops.slice(-12);
+  const slots=Math.max(6,visible.length);
+
+  for(let i=0;i<slots;i++){
+    const crop=visible[i];
+    const plot=document.createElement("div");
+    plot.className="plot";
+
+    const icon=document.createElement("span");
+    icon.textContent=crop?crop.emoji:"🟤";
+
+    const caption=document.createElement("small");
+    caption.textContent=crop
+      ?money(crop.amount)
+      :"빈 밭";
+
+    plot.append(icon,caption);
+    box.appendChild(plot);
+  }
+}
+
+function renderDecorations(id){
+  const box=$(id);
+  box.replaceChildren();
+
+  state.placed.forEach(itemId=>{
+    const item=ITEMS.find(x=>x.id===itemId);
+    if(!item || item.type!=="decor")return;
+
+    const span=document.createElement("span");
+    span.textContent=item.emoji;
+    span.title=item.name;
+    box.appendChild(span);
+  });
+}
+
+function renderFarm(){
+  const saved=totalSaved();
+  const rate=progressRate();
+
+  $("totalSaved").textContent=money(saved);
+  $("goalSummary").textContent=
+    state.goal>0?money(state.goal):"미설정";
+  $("rateSummary").textContent=
+    state.goal>0?rate.toFixed(1)+"%":"0%";
+  $("timesSummary").textContent=
+    state.crops.length+"회";
+
+  $("farmLevel").textContent="농장 Lv."+level();
+  $("levelBadge").textContent="Lv."+level();
+  $("character").textContent=characterEmoji();
+  $("previewCharacter").textContent=characterEmoji();
+  $("characterMessage").textContent=state.lastMessage;
+
+  $("cropCount").textContent=
+    `총 ${state.crops.length}개 작물을 심었어요! `+
+    `최근 12개 작물이 화면에 표시됩니다.`;
+
+  $("farmProgressText").textContent=
+    state.goal>0
+      ?`${money(saved)} / ${money(state.goal)}`
+      :"목표를 설정해 주세요.";
+
+  $("farmProgressRate").textContent=
+    state.goal>0?rate.toFixed(1)+"%":"0%";
+
+  $("farmProgressFill").style.width=
+    Math.min(100,rate)+"%";
+
+  $("growthHint").textContent=
+    state.goal<=0
+      ?"🌱 저축 목표를 먼저 정해 보세요."
+      :rate>=100
+        ?"🏆 목표 달성! 농장에 멋진 변화가 찾아왔어요!"
+        :rate>=50
+          ?"🌻 목표의 절반을 넘었어요! 농장이 무럭무럭 자라요."
+          :"🌱 작은 저축도 하나씩 쌓이면 큰 성과가 돼요.";
+
+  renderPlots("farmPlots");
+  renderPlots("previewPlots");
+  renderDecorations("farmDecorations");
+  renderDecorations("previewDecorations");
+}
+
+/* 8. 보상 창고 */
+
+function inventoryCounts(){
+  const counts={};
+
+  state.inventory.forEach(id=>{
+    counts[id]=(counts[id]||0)+1;
+  });
+
+  return counts;
+}
+
+function renderInventory(){
+  const counts=inventoryCounts();
+
+  $("rewardCount").textContent=
+    state.inventory.length+"개";
+  $("uniqueCount").textContent=
+    Object.keys(counts).length+"종";
+
+  const box=$("inventoryGrid");
+  box.replaceChildren();
+
+  if(!state.inventory.length){
+    const empty=document.createElement("div");
+    empty.className="empty";
+    empty.textContent=
+      "아직 보상이 없어요. 저축을 완료하면 선물을 받을 수 있어요!";
+    box.appendChild(empty);
+    return;
+  }
+
+  ITEMS.filter(item=>counts[item.id]).forEach(item=>{
+    const card=document.createElement("div");
+    card.className="reward-item";
+
+    const emoji=document.createElement("div");
+    emoji.className="reward-icon";
+    emoji.textContent=item.emoji;
+
+    const name=document.createElement("strong");
+    name.textContent=item.name;
+
+    const count=document.createElement("small");
+    count.textContent=`보유 ${counts[item.id]}개 · `+
+      (item.type==="seed"?"씨앗":
+       item.type==="decor"?"장식":"의상");
+
+    card.append(emoji,name,count);
+
+    if(item.type==="decor"){
+      const active=state.placed.includes(item.id);
+
+      const btn=document.createElement("button");
+      btn.className="btn btn-light btn-small";
+      btn.textContent=active?"장식 치우기":"농장에 설치";
+
+      btn.onclick=()=>{
+        if(!commit(()=>{
+          if(active){
+            state.placed=state.placed.filter(id=>id!==item.id);
+          }else{
+            state.placed.push(item.id);
+          }
+        }))return;
+
+        renderAll();
+        toast(active?"장식을 치웠어요.":"농장에 장식을 설치했어요!");
+      };
+
+      card.appendChild(btn);
+    }
+
+    if(item.type==="outfit"){
+      const active=state.outfit===item.id;
+      const btn=document.createElement("button");
+      btn.className="btn btn-light btn-small";
+      btn.textContent=active?"의상 벗기":"의상 입히기";
+
+      btn.onclick=()=>{
+        if(!commit(()=>{
+          state.outfit=active?null:item.id;
+        }))return;
+
+        renderAll();
+        toast(active?"기본 의상으로 돌아왔어요.":"캐릭터가 새 옷을 입었어요!");
+      };
+
+      card.appendChild(btn);
+    }
+
+    box.appendChild(card);
+  });
+}
+
+/* 9. 용돈 내역 */
+
+function renderWallet(){
+  $("walletBalance").textContent=money(walletBalance());
+  $("incomeTotal").textContent=money(totalIncome());
+  $("expenseTotal").textContent=money(totalExpense());
+
+  const totals={};
+  state.records.filter(r=>r.type==="expense").forEach(r=>{
+    totals[r.category]=(totals[r.category]||0)+r.amount;
+  });
+
+  const categories=$("categoryStats");
+  categories.replaceChildren();
+
+  const sorted=Object.entries(totals).sort((a,b)=>b[1]-a[1]);
+
+  if(!sorted.length){
+    const empty=document.createElement("div");
+    empty.className="empty";
+    empty.textContent="아직 지출 기록이 없어요.";
+    categories.appendChild(empty);
+  }else{
+    sorted.forEach(([category,amount])=>{
+      const wrapper=document.createElement("div");
+      const line=document.createElement("div");
+      line.className="category-line";
+
+      const name=document.createElement("span");
+      name.textContent=category;
+
+      const value=document.createElement("strong");
+      value.textContent=money(amount);
+
+      line.append(name,value);
+
+      const bar=document.createElement("div");
+      bar.className="category-bar";
+
+      const fill=document.createElement("div");
+      fill.style.width=
+        (amount/totalExpense()*100)+"%";
+
+      bar.appendChild(fill);
+      wrapper.append(line,bar);
+      categories.appendChild(wrapper);
+    });
+  }
+
+  const records=$("recordsList");
+  records.replaceChildren();
+
+  if(!state.records.length){
+    const empty=document.createElement("div");
+    empty.className="empty";
+    empty.textContent="아직 용돈·저축 내역이 없어요.";
+    records.appendChild(empty);
+    return;
+  }
+
+  [...state.records].reverse().slice(0,60).forEach(r=>{
+    const row=document.createElement("div");
+    row.className="record";
+    const left=document.createElement("div");
+    const title=document.createElement("strong");
+    title.textContent=
+      r.type==="income"?"💵 용돈 입금":
+      r.type==="saving"?"🌱 저축 완료":
+      "🧾 "+r.name;
+
+    const detail=document.createElement("small");
+    detail.textContent=r.date+
+      (r.type==="saving"
+        ?(r.source==="wallet"?" · 용돈에서 저축":" · 별도 저축")
+        :r.type==="expense"?" · "+r.category:"");
+
+    left.append(title,detail);
+
+    const amount=document.createElement("div");
+    amount.className="record-amount";
+    amount.style.color=
+      r.type==="expense"?"var(--red)":
+      r.type==="saving"?"var(--green)":"var(--deep)";
+    amount.textContent=
+      (r.type==="expense"?"-":"+")+money(r.amount);
+
+    row.append(left,amount);
+    records.appendChild(row);
+  });
+}
+
+/* 10. 저축 화면 */
+
+function renderSavings(){
+  const saved=totalSaved();
+  const rate=progressRate();
+
+  $("goalStatus").textContent=
+    state.goal>0
+      ?`현재 목표: ${money(state.goal)}`
+      :"아직 목표가 설정되지 않았어요.";
+
+  $("savingTotal").textContent=money(saved);
+  $("savingRemaining").textContent=
+    state.goal>0
+      ?money(Math.max(0,state.goal-saved))
+      :"-";
+
+  $("savingProgressFill").style.width=
+    Math.min(100,rate)+"%";
+
+  $("savingProgressLabel").textContent=
+    state.goal>0
+      ?`목표 달성률 ${rate.toFixed(1)}%`
+      :"목표 금액을 설정해 주세요.";
+
+  renderSourceHint();
+}
+
+function renderAll(){
+  renderFarm();
+  renderSavings();
+  renderWallet();
+  renderInventory();
+}
+
+renderAll();
+
+</script>
+</body>
+</html>
